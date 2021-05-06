@@ -15,7 +15,9 @@ QuestionRetriever class >> new: cuoora [
 
 { #category : #'instance creation' }
 QuestionRetriever class >> new: cuoora and: aSymbol [
-	^ self new cuoora: cuoora; option:aSymbol; yourself.
+	^ self new
+		initializeWithCuoora: cuoora withOption: aSymbol;
+		yourself
 ]
 
 { #category : #accesing }
@@ -23,48 +25,100 @@ QuestionRetriever >> cuoora: aCuooraInstance [
 	cuoora := aCuooraInstance 
 ]
 
+{ #category : #private }
+QuestionRetriever >> getAverageFromVotes: aQuestionCollection [
+	^ (cuoora questions
+		sum: [ :q | q positiveVotes size ]) / aQuestionCollection size
+]
+
+{ #category : #private }
+QuestionRetriever >> getQuestionsAboveAverage: aQuestionCollection [
+	^ (aQuestionCollection
+		select:
+			[ :q | q positiveVotes size >= (self getAverageFromVotes: aQuestionCollection) ])
+		asSortedCollection: [ :a :b | a positiveVotes size > b positiveVotes size ]
+]
+
+{ #category : #private }
+QuestionRetriever >> getQuestionsByAverageVoteFrom: aQuestionCollection [
+^(self getQuestionsAboveAverage:aQuestionCollection) last: (100 min: (self getQuestionsAboveAverage: aQuestionCollection) size).
+]
+
+{ #category : #private }
+QuestionRetriever >> getQuestionsByVoteFrom: aQuestionCollection [
+	^ (self orderQuestionsByVote: aQuestionCollection)
+		last: (100 min: (self orderQuestionsByVote: aQuestionCollection) size)
+]
+
+{ #category : #private }
+QuestionRetriever >> getQuestionsFromFollowed: aUser [
+	^aUser following flatCollect: [ :follow | follow questions ]
+]
+
+{ #category : #private }
+QuestionRetriever >> getQuestionsFromNews [
+	^ cuoora questions
+		select: [ :q | q timestamp asDate = Date today ].
+]
+
+{ #category : #private }
+QuestionRetriever >> getQuestionsFromTopics: aUser [
+	^aUser topics flatCollect: [ :topic | topic questions ].
+]
+
 { #category : #initializing }
 QuestionRetriever >> initialize [
 	option := #social
 ]
 
-{ #category : #accesing }
-QuestionRetriever >> option: anOption [
+{ #category : #initializing }
+QuestionRetriever >> initializeWithCuoora: aCuooraInstance withOption: anOption [
+	self cuoora: aCuooraInstance.
 	option := anOption
+]
+
+{ #category : #private }
+QuestionRetriever >> orderQuestionsByVote: aQuestionCollection [
+	^ aQuestionCollection asSortedCollection: [ :a :b | a positiveVotes size > b positiveVotes size ].
+]
+
+{ #category : #retrieving }
+QuestionRetriever >> retrieveNewQuestions [
+	^ self getQuestionsByVoteFrom: (self getQuestionsFromNews)
+]
+
+{ #category : #retrieving }
+QuestionRetriever >> retrievePopularQuestions [
+	|popularTCol|
+	popularTCol := OrderedCollection new.
+			cuoora questions
+				do: [ :q | 
+					q timestamp asDate = Date today
+						ifTrue: [ popularTCol add: q ] ].
+			^self getQuestionsByAverageVoteFrom: popularTCol.
 ]
 
 { #category : #retrieving }
 QuestionRetriever >> retrieveQuestions: aUser [
-	| qRet temp followingCol topicsCol newsCol popularTCol averageVotes|
+	| qRet|
 	qRet := OrderedCollection new.
-	option = #social ifTrue:[
-			followingCol := OrderedCollection new.
-			aUser following do:[ :follow | followingCol addAll: follow questions ].
-			temp := followingCol asSortedCollection:[ :a :b | a positiveVotes size > b positiveVotes size ].
-			qRet := temp last: (100 min: temp size).
-		].
+	option = #social
+		ifTrue: [ qRet := self retrieveSocialQuestions: aUser ].
+	option = #topics
+		ifTrue: [ qRet := self retrieveTopicQuestions: aUser ].
+	option = #news
+		ifTrue: [ qRet := self retrieveNewQuestions ].
+	option = #popularToday
+		ifTrue: [ qRet := self retrievePopularQuestions ].
+	^ qRet reject: [ :q | q user = aUser ]
+]
 
-	option = #topics ifTrue:[
-			topicsCol := OrderedCollection new.
-			aUser topics do:[ :topic | topicsCol addAll: topic questions ].
-			temp := topicsCol asSortedCollection:[ :a :b | a positiveVotes size > b positiveVotes size ].
-			qRet := temp last: (100 min: temp size).
-		].
-	
-	option = #news ifTrue:[
-			newsCol := OrderedCollection new.
-			cuoora questions do:[:q | (q timestamp asDate = Date today) ifTrue: [newsCol add: q]].
-			temp := newsCol asSortedCollection:[ :a :b | a positiveVotes size > b positiveVotes size ].
-			qRet := temp last: (100 min: temp size).
-		].
+{ #category : #retrieving }
+QuestionRetriever >> retrieveSocialQuestions: aUser [
+	^ self getQuestionsByVoteFrom: (self getQuestionsFromFollowed: aUser).
+]
 
-	option = #popularToday ifTrue:[
-			popularTCol := OrderedCollection new.
-			cuoora questions do:[:q | (q timestamp asDate = Date today) ifTrue: [popularTCol add: q]].
-			averageVotes := (cuoora questions sum: [:q | q positiveVotes size ]) / popularTCol size.
-			temp := (popularTCol select:[:q | q positiveVotes size >= averageVotes ]) asSortedCollection:[ :a :b | a positiveVotes size > b positiveVotes size ].
-			qRet := temp last: (100 min: temp size).
-		].
-	
-	^qRet reject:[:q | q user = aUser].
+{ #category : #retrieving }
+QuestionRetriever >> retrieveTopicQuestions: aUser [
+	^ self getQuestionsByVoteFrom: (self getQuestionsFromTopics: aUser).
 ]

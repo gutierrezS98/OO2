@@ -17,16 +17,8 @@ Class {
 { #category : #'instance-creation' }
 User class >> username: aUsername password: aPassword questionRetriever: aQuestionRetriever [
 	^ self new
-		username: aUsername;
-		password: aPassword;
-		questionRetriever: aQuestionRetriever;
+		initializeWithUsername: aUsername password: aPassword questionRetriever: aQuestionRetriever;
 		yourself
-]
-
-{ #category : #accessing }
-User >> addAnswer: anAnswer [
-	answers add: anAnswer 
-
 ]
 
 { #category : #accessing }
@@ -43,11 +35,6 @@ User >> addTopic: aTopic [
 { #category : #accessing }
 User >> addVote: aVote [
 	votes add: aVote
-]
-
-{ #category : #accessing }
-User >> answers [
-	^ answers
 ]
 
 { #category : #accessing }
@@ -70,24 +57,11 @@ User >> initialize [
 	votes := OrderedCollection new.
 ]
 
-{ #category : #accessing }
-User >> password [
-	^ password
-]
-
-{ #category : #private }
-User >> password: anObject [
-	password := anObject
-]
-
-{ #category : #accessing }
-User >> questionRetriever [
-	^ questionRetriever
-]
-
-{ #category : #private }
-User >> questionRetriever: aQuestionRetriever [
-	questionRetriever := aQuestionRetriever.
+{ #category : #initialize }
+User >> initializeWithUsername: aUsername password: aPassword questionRetriever: aQuestionRetriever [
+username :=aUsername.
+password :=aPassword .
+questionRetriever :=aQuestionRetriever 
 ]
 
 { #category : #accessing }
@@ -96,23 +70,8 @@ User >> questions [
 ]
 
 { #category : #accessing }
-User >> questionsOfInterest [
-	^ questionRetriever retrieveQuestions: self.
-]
-
-{ #category : #accessing }
 User >> topics [
 	^ topics
-]
-
-{ #category : #accessing }
-User >> username [
-	^ username
-]
-
-{ #category : #private }
-User >> username: anObject [
-	username := anObject
 ]
 
 { #category : #accessing }

@@ -1,14 +1,10 @@
 Class {
 	#name : #Question,
-	#superclass : #Object,
+	#superclass : #Post,
 	#instVars : [
 		'title',
 		'answers',
-		'topics',
-		'timestamp',
-		'user',
-		'votes',
-		'description'
+		'topics'
 	],
 	#category : #'TP-Refactoring-Model'
 }
@@ -16,86 +12,41 @@ Class {
 { #category : #'instance creation' }
 Question class >> newWithTitle: title description: aDescription user: aUser [
 	^ self new
-		title: title;
-		description: aDescription;
-		user: aUser;
-		yourself.
+		initializeWithTitle:title description:aDescription user:aUser;
+		yourself
 ]
 
 { #category : #'instance creation' }
 Question class >> newWithTitle: title description: aDescription user: aUser topic: aTopic [
 	^ self new
-		title: title;
-		description: aDescription;
-		addTopic: aTopic;
-		user: aUser;
-		yourself.
-]
-
-{ #category : #adding }
-Question >> addTopic: aTopic [
-	topics add: aTopic.
-	aTopic addQuestion: self.
-
-]
-
-{ #category : #adding }
-Question >> addVote: aVote [
-	votes add: aVote
-]
-
-{ #category : #accessing }
-Question >> description [
-	^ description
-]
-
-{ #category : #private }
-Question >> description: anObject [
-	description := anObject
+		initializeWithTitle: title description: aDescription user: aUser topic:aTopic;
+		yourself
 ]
 
 { #category : #'initalize-release' }
 Question >> initialize [
+	super initialize.
 	answers := OrderedCollection new.
-	topics := OrderedCollection new.
-	votes := OrderedCollection new.
-	timestamp := DateAndTime now.
+	topics := OrderedCollection new
 ]
 
-{ #category : #'as yet unclassified' }
-Question >> negativeVotes [
-	| r |
-	r := OrderedCollection new.
-	votes do:[:vote | vote isLike ifFalse:[r add: vote]].
-	^r
+{ #category : #intialization }
+Question >> initializeWithTitle: aTitle description: aDescription user: aUser [
+	title := aTitle.
+	description := aDescription.
+	user := aUser
 ]
 
-{ #category : #'as yet unclassified' }
-Question >> positiveVotes [
-	| r |
-	r := OrderedCollection new.
-	votes do:[:vote | vote isLike ifTrue:[r add: vote]].
-	^r
+{ #category : #intialization }
+Question >> initializeWithTitle: aTitle description: aDescription user: aUser topic: aTopic [
+	self initializeWithTitle:aTitle description:aDescription user: aUser.
+	topics add: aTopic.
+	aTopic addQuestion: self
 ]
 
 { #category : #accessing }
 Question >> timestamp [
 	^ timestamp
-]
-
-{ #category : #private }
-Question >> timestamp: anObject [
-	timestamp := anObject
-]
-
-{ #category : #accessing }
-Question >> title [
-	^title 
-]
-
-{ #category : #accessing }
-Question >> title: aTitle [
-	title := aTitle 
 ]
 
 { #category : #accessing }
@@ -106,14 +57,4 @@ Question >> topics [
 { #category : #accessing }
 Question >> user [
 	^ user
-]
-
-{ #category : #private }
-Question >> user: anObject [
-	user := anObject
-]
-
-{ #category : #accessing }
-Question >> votes [
-	^ votes
 ]

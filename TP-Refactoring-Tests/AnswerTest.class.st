@@ -9,7 +9,10 @@ Class {
 
 { #category : #setup }
 AnswerTest >> setUp [
-	answer := Answer new:'An answer'  user:(User new)  question:(Question new).
+	answer := Answer
+		description: 'An answer'
+		user: User new
+		question: Question new
 ]
 
 { #category : #testing }
