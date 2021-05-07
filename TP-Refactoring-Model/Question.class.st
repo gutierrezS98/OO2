@@ -23,6 +23,11 @@ Question class >> newWithTitle: title description: aDescription user: aUser topi
 		yourself
 ]
 
+{ #category : #accessing }
+Question >> getPositiveVotesSize [
+	^ self positiveVotes size
+]
+
 { #category : #'initalize-release' }
 Question >> initialize [
 	super initialize.
@@ -42,6 +47,11 @@ Question >> initializeWithTitle: aTitle description: aDescription user: aUser to
 	self initializeWithTitle:aTitle description:aDescription user: aUser.
 	topics add: aTopic.
 	aTopic addQuestion: self
+]
+
+{ #category : #accessing }
+Question >> isToday [
+^ timestamp asDate = Date today
 ]
 
 { #category : #accessing }

@@ -47,6 +47,16 @@ User >> following [
 	^ following
 ]
 
+{ #category : #accessing }
+User >> getQuestionsFromFollowed [
+	^ following flatCollect: [ :follow | follow questions ]
+]
+
+{ #category : #accessing }
+User >> getQuestionsFromTopics [
+	^ topics flatCollect: [ :topic | topic questions ]
+]
+
 { #category : #initialize }
 User >> initialize [
 

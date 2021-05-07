@@ -20,6 +20,16 @@ CuOOra >> addUser: aUser [
 
 ]
 
+{ #category : #accessing }
+CuOOra >> getQuestionsFromToday [
+	^ questions select: [ :q | q isToday]
+]
+
+{ #category : #accessing }
+CuOOra >> getTotalPositiveVotes [
+	^ questions sum: [ :q | q getPositiveVotesSize  ]
+]
+
 { #category : #initialize }
 CuOOra >> initialize [
 	users := OrderedCollection new.
