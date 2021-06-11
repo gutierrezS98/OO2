@@ -9,7 +9,7 @@ NewsRetriever >> retrieveNewQuestions [
 	^ self getQuestionsByVoteFrom: cuoora getQuestionsFromToday
 ]
 
-{ #category : #protected }
+{ #category : #accessing }
 NewsRetriever >> retrieveQuestionsBaseOnOption: aUser [
 	^ self retrieveNewQuestions
 ]

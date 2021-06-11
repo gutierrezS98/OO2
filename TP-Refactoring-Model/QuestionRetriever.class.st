@@ -17,7 +17,7 @@ QuestionRetriever class >> createRetrieverWith: cuoora and: type [
 	type = #news
 		ifTrue: [ ^ NewsRetriever new: cuoora ].
 	type = #popularToday
-		ifTrue: [ ^ PopularTodayRetriever new: cuoora ]
+		ifTrue: [ ^ PopularTodayRetriever new: cuoora ].
 ]
 
 { #category : #'instance creation' }
@@ -44,7 +44,8 @@ QuestionRetriever >> orderQuestionsByVote: aQuestionCollection [
 
 { #category : #protected }
 QuestionRetriever >> retrieveQuestions: aUser [
-	^(self retrieveQuestionsBaseOnOption: aUser)reject: [ :q | q user = aUser ]
+	^ (self retrieveQuestionsBaseOnOption: aUser)
+		reject: [ :q | q isUser: aUser]
 ]
 
 { #category : #protected }

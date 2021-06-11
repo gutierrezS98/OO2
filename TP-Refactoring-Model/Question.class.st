@@ -55,6 +55,11 @@ Question >> isToday [
 ]
 
 { #category : #accessing }
+Question >> isUser:aUser [ 
+^ user = aUser
+]
+
+{ #category : #accessing }
 Question >> timestamp [
 	^ timestamp
 ]
